@@ -1,0 +1,35 @@
+{% extends "stocks_info/home.html" %}
+{% block page %}
+
+
+
+<!--
+  {% for i in output.items %}
+  <div class="container row">
+<div class="col">
+    <h5>{{i.0}}:</h5>
+</div>
+<div class="col">
+    <p>{{i.1}}</p>
+</div>
+</div>
+  {% endfor %}-->
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Ticker</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for i in output.items %}
+    <tr>
+      <th scope="row">{{i.0}}</th>
+      <td>{{i.1}}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+
+{% endblock %}

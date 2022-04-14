@@ -1,0 +1,33 @@
+{% extends "stocks_info/home.html" %}
+{% block page %}
+
+
+
+
+<!--{% for ticker in news %}
+    <p>{{ticker|safe}}</p>
+{% endfor %}-->
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Ticker</th>
+      <th scope="col">Date</th>
+      <th scope="col">Time</th>
+      <th scope="col">Title</th>
+      <th scope="col">score</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for i in news %}
+    <tr>
+      <th scope="row">{{i.0}}</th>
+      <td>{{i.1}}</td>
+      <td>{{i.2}}</td>
+      <td>{{i.3}}</td>
+      <td>{{i.4}}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

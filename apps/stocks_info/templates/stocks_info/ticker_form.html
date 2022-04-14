@@ -1,0 +1,40 @@
+{% extends "stocks_info/home.html" %}
+{% block page %}
+<form method="POST">
+    {% csrf_token %}
+    <div class="input-group mb-3">
+        {{ form.ticker }}
+        <button type="submit" class="btn btn-primary">Get info!</button>
+    </div>
+</form>
+
+<!--<div>{{stock_data}}</div>-->
+
+
+{% if stock_data %}
+<h3>
+  Shares float:
+  <small class="text-muted"> {{shares_float}} Bln</small>
+</h3>
+
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Title</th>
+      <th scope="col">Info</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for i in stock_data.items %}
+    <tr>
+      <th scope="row">{{i.0}}</th>
+      <td>{{i.1}}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% endif %}
+
+{% endblock %}
