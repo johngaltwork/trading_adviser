@@ -1,12 +1,24 @@
 {% extends "stocks_info/home.html" %}
 {% block page %}
+<form method="POST">
+    {% csrf_token %}
+    <div class="input-group mb-3">
+        {{ form.ticker }}
+        <button type="submit" class="btn btn-primary">Get news!</button>
+    </div>
+</form>
 
+ <!--<p>{{news}}</p>-->
 
-
-
-<!--{% for ticker in news %}
-    <p>{{ticker|safe}}</p>
-{% endfor %}-->
+{% if news %}
+<table class="table table-borderless">
+    <tr>
+    {% for key, value in fundamental_info.items %}
+      <th scope="row" class="text-end"><p><small><strong>{{key}}:</strong></small></p></th>
+      <td class="text-start"><p><small>{{value}}</small></p></td>
+    {% endfor %}
+    </tr>
+</table>
 <table class="table table-striped">
   <thead>
     <tr>
@@ -23,11 +35,12 @@
       <th scope="row">{{i.0}}</th>
       <td>{{i.1}}</td>
       <td>{{i.2}}</td>
-      <td>{{i.3}}</td>
-      <td>{{i.4}}</td>
+      <td><a href={{i.4}} target="_blank">{{i.3}}</a></td>
+      <td>{{i.5}}</td>
     </tr>
   {% endfor %}
   </tbody>
 </table>
+{% endif %}
 
 {% endblock %}

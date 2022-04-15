@@ -28,5 +28,21 @@ def snp500_view(request):
 
 
 def finviz_news(request):
-    req = finviz_parse_news()
-    return render(request, 'stocks_info/finviz_news.html', {'news': req})
+    if request.method == 'POST':
+        form = TickerForm(request.POST)
+        if form.is_valid():
+            ticker = form.cleaned_data['ticker'].upper()
+            stock_data = finviz_parse_news_form(ticker)
+            fundamental_info = get_stock_fundamental_info(ticker)
+            return render(request, 'stocks_info/finviz_news.html',
+                          {
+                              'form': form,
+                              'news': stock_data,
+                              'fundamental_info': fundamental_info,
+                          }
+                          )
+    else:
+        form = TickerForm()
+        return render(request, 'stocks_info/finviz_news.html', {'form': form})
+
+
