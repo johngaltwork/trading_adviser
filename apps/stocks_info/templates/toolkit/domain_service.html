@@ -1,0 +1,32 @@
+{% extends "stocks_info/home.html" %}
+
+{% block page %}
+{{cleaned_data}}
+{{test_response}}
+
+    <form method="post" class="form-inline .was-validated">
+    {% csrf_token %}
+        <div class="form-group pull-left get-aliases-form">
+          {{ form.create_domain }}
+          <button class="btn btn-primary get-aliases" type="submit">Create Domain!</button>
+        </div>
+    </form>
+
+    <form method="post" class="form-inline .was-validated">
+    {% csrf_token %}
+        <div class="form-group pull-left get-aliases-form">
+          {{ form.get_domain_info }}
+          <button class="btn btn-primary get-aliases" type="submit">Get Domain Info!</button>
+        </div>
+    </form>
+
+    <form method="post" class="form-inline .was-validated">
+    {% csrf_token %}
+        <div class="form-group pull-left get-aliases-form">
+          {{ form.delete_domain }}
+          <button class="btn btn-primary get-aliases" type="submit">Delete Domain!</button>
+        </div>
+    </form>
+
+
+{% endblock %}

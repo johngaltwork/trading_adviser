@@ -1,0 +1,253 @@
+{% extends "stocks_info/home.html" %}
+
+{% block page %}
+<!-- set jquery cdn -->
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous">
+  </script>
+{{form}}
+<!-- Get Alias form -->
+<div class="container">
+  <div class="row">
+    <div class="col col-md-6">
+      <form method="post" class="form-inline .was-validated">
+        {% csrf_token %}
+        <div class="form-group pull-left get-aliases-form">
+          {{ form.get_mailbox_aliases }}
+          <button class="btn btn-primary get-aliases" type="submit">Get Aliases!</button>
+        </div>
+      </form>
+    </div>
+    <div class="col col-md-4">
+    </div>
+    <div class="col col-md-2">
+      <button type="button" class="btn btn-primary end-0 pull-right create-alias" data-toggle="modal"
+        data-target="#create-alias-modal">Create Alias!</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Alias form  -->
+<!--<div class="modal fade" id="create-alias-modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="modalLabel-create">Create mailbox alias!</h4>
+      </div>-->
+      <form method="post">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="form-group create-alias-form">
+            {{ form.create_mailbox_alias }}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" type="submit">Create Alias!</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
+<!--
+    </div>
+  </div>
+</div>-->
+
+
+<!--{% if response %}
+{% if response.result %}
+<div class="container">
+  {% if extra_data.method == "get_mailbox_aliases" %}
+  <div class="row">
+    <div class="col col-md-12">
+      <h3>Aliases for <b>{{extra_data.mailbox}}</b></h3>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col col-md-12">
+      <table class="table table-striped border border-1 rounded-3 p-3 shadow p-3 mb-5 bg-body rounded">
+        <thead>
+          <tr>
+            <th scope="col" class="col-md-2">Status</th>
+            <th scope="col" class="col-md-2">Active</th>
+            <th scope="col" class="col-md-4">Alias</th>
+            <th scope="col" class="col-md-2"></th>
+            <th scope="col" class="col-md-2"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in response.result %}
+          <tr>
+            <td class="text-success"><strong>Success</strong></td>
+            <td>{{row.Active}}</td>
+            <td>{{row.Alias}}</td>
+            <td><button type="button" alias="{{row.Alias}}" active_mailbox="{{extra_data.mailbox}}"
+                class="btn btn-primary btn-sm update-alias" data-toggle="modal"
+                data-target="#update-alias-modal">Update</button></td>
+            <td><button type="button" alias="{{row.Alias}}" active_mailbox="{{extra_data.mailbox}}"
+                class="btn btn-secondary btn-sm btn-danger delete-alias" data-toggle="modal"
+                data-target="#delete-alias-modal">Delete</button></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+-->
+
+  <!-- Update Alias form  -->
+  <div class="modal fade" id="update-alias-modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title" id="modalLabel-update">Update mailbox alias!</h4>
+        </div>
+        <form method="post">
+          {% csrf_token %}
+          <div class="modal-body">
+            <div class="form-group update-alias-form">
+              {{ form.update_mailbox_alias }}
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" type="submit">Update Alias!</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Alias form  -->
+  <div class="modal fade" id="delete-alias-modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title" id="modalLabel-delete">Delete mailbox alias!</h4>
+        </div>
+        <form method="post">
+          {% csrf_token %}
+          <div class="modal-body">
+            <div class="form-group delete-alias-form">
+              {{ form.delete_mailbox_alias }}
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" type="submit">Delete Alias!</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+<!--
+  {% endif %}-->
+
+  <!-- Successfully create mailbox alias -->
+  {% if extra_data.method == "create_mailbox_alias" %}
+  <div class="row">
+    <div class="col col-md-12">
+      <h3>You have successfully created the alias <b>{{extra_data.cleaned_data.alias}}</b> for mailbox
+        <b>{{extra_data.cleaned_data.mailbox}}</b></h3>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Successfully update mailbox alias -->
+  {% if extra_data.method == "update_mailbox_alias" %}
+  <div class="row">
+    <div class="col col-md-12">
+      <h3>You have successfully updated the alias <b>{{extra_data.cleaned_data.old_alias}}</b> to
+        <b>{{extra_data.cleaned_data.new_alias}}</b> for mailbox <b>{{extra_data.cleaned_data.mailbox}}</b></h3>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Successfully delete mailbox alias -->
+  {% if extra_data.method == "delete_mailbox_alias" %}
+  <div class="row">
+    <div class="col col-md-12">
+      <h3>You have successfully deleted the alias <b>{{extra_data.cleaned_data.alias}}</b> for mailbox
+        <b>{{extra_data.mailbox}}</b></h3>
+    </div>
+  </div>
+  {% endif %}
+
+  {% elif response.error %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col" class="col-md-3">Status</th>
+        <th scope="col" class="col-md-9">Message</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="text-danger"><strong>Error</strong></td>
+        <td>{{response.error}}</td>
+      </tr>
+    </tbody>
+  </table>
+  {% else %}
+  {% if response.result|length == 0 %}
+  <!-- If Mailbox does not have any aliases -->
+  <div class="row">
+    <div class="col col-md-12">
+      <h3>The mailbox <b>{{extra_data.mailbox}}</b> does not have any aliases</h3>
+    </div>
+  </div>
+  {% else %}
+  <!-- Other unexpected errors -->>
+  <div class="container">
+    <div class="row">
+      <div class="col col-md-12 border border-2 rounded-3 p-3 shadow p-3 mb-5 bg-body rounded">
+        <p class="text-center text-danger"><strong>{{response}}</strong></p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
+</div>
+{% endif %}
+
+<script>
+  $(document).ready(function () {
+    $('#id_mailbox, #id_alias, #id_old_alias, #id_new_alias').attr('pattern', '[0-9A-Za-z\.]{1,}@[-A-Za-z]{1,}\.{1,2}[-A-Za-z]{2,}$')
+  })
+
+  $('button.update-alias').click(function () {
+    alias = $(this).attr('alias')
+    active_mailbox = $(this).attr('active_mailbox')
+    domain_name = active_mailbox.split("@").pop()
+    $('.update-alias-form #id_old_alias').val(alias).attr('readonly', 'readonly')
+    $('.update-alias-form #id_mailbox').val(active_mailbox)
+    $('.update-alias-form #id_domain_name').val(domain_name)
+    $('.update-alias-form #id_mailbox, #id_domain_name, #id_old_alias, #id_new_alias').attr('required', true)
+  })
+
+  $('button.delete-alias').click(function () {
+    alias = $(this).attr('alias')
+    active_mailbox = $(this).attr('active_mailbox')
+    $('.delete-alias-form #id_alias').val(alias).attr('readonly', 'readonly')
+    $('.delete-alias-form #id_active_mailbox').val(active_mailbox)
+  })
+
+  $('button.create-alias').click(function () {
+    $('.create-alias-form #id_mailbox, #id_domain_name, #id_alias').attr('required', true)
+  })
+
+  $('button.get-aliases').click(function () {
+    $('.get-aliases-form #id_mailbox').attr('required', true)
+  })
+</script>
+{% endblock %}

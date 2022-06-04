@@ -122,3 +122,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+FACADE_API_URL = 'http://localhost:4444/json_rpc/v1'
+FACADE_API_TOKEN = 'Token token1234'

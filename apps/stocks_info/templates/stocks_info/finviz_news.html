@@ -1,4 +1,7 @@
 {% extends "stocks_info/home.html" %}
+{% block title %}
+<h2 class="text-center">Stock news</h2>
+{% endblock %}
 {% block page %}
 <form method="POST">
     {% csrf_token %}

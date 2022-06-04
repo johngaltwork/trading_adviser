@@ -1,0 +1,95 @@
+
+{% extends "stocks_info/home.html" %}
+{% block title %}
+<h2 class="text-center">Pandas Back-Test</h2>{% endblock %}
+{% block page %}
+
+<p class="text-center">Try to back-testing some ticker for 'prev day low' strategy for last 60 trading days, with different loss and takes</p>
+
+{% load tz %}
+{% localtime off %}
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="input-group mb-3">
+        {{ form.ticker }}
+        {{ form.stop_loss }}
+        {{ form.take_profit }}
+        <button type="submit" class="btn btn-primary">Run Back-Test!</button>
+    </div>
+</form>
+
+{% if list_output %}
+{{list_output}}
+{% endif %}
+
+{% if output %}
+
+<table class="table table-borderless">
+    <tr>
+      <th scope="row" class="text-center"><p><small><strong>Ticker:</strong></small></p></th>
+      <td class="text-start"><p><small>{{ticker}}</small></p></td>
+      <th scope="row" class="text-center"><p><small><strong>Win Rate:</strong></small></p></th>
+      <td class="text-start"><p><small>{{winrate}} %</small></p></td>
+      <th scope="row" class="text-center text-primary"><p><small><strong>All trades:</strong></small></p></th>
+      <td class="text-start"><p><small>{{all_trades}}</small></p></td>
+      <th scope="row" class="text-center text-success"><p><small><strong>Profit trades:</strong></small></p></th>
+      <td class="text-start"><p><small>{{profit_trades}}</small></p></td>
+      <th scope="row" class="text-center text-danger"><p><small><strong>Loss trades:</strong></small></p></th>
+      <td class="text-start"><p><small>{{loss_trades}}</small></p></td>
+    </tr>
+    <tr>
+      <th scope="row" class="text-center"><p><small><strong>win/loss:</strong></small></p></th>
+      <td class="text-start"><p><small>{{winnloss}}</small></p></td>
+      <th scope="row" class="text-center"><p><small><strong>ATR:</strong></small></p></th>
+      <td class="text-start"><p><small>{{atr}}</small></p></td>
+      <th scope="row" class="text-center text-primary"><p><small><strong>PnL:</strong></small></p></th>
+      <td class="text-start"><p><small>{{pnl}}</small></p></td>
+      <th scope="row" class="text-center text-success"><p><small><strong>Total profit:</strong></small></p></th>
+      <td class="text-start"><p><small>{{total_profit}}</small></p></td>
+      <th scope="row" class="text-center text-danger"><p><small><strong>Total loss:</strong></small></p></th>
+      <td class="text-start"><p><small>{{total_loss}}</small></p></td>
+    </tr>
+</table>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+        <th scope="col">Date Time</th>
+        <th scope="col">Open</th>
+        <th scope="col">High</th>
+        <th scope="col">Low</th>
+        <th scope="col">Close</th>
+        <th scope="col">Volume</th>
+        <th scope="col">Date</th>
+        <th scope="col">Day Low</th>
+        <th scope="col">Prev Day Low</th>
+        <th scope="col">one day</th>
+        <th scope="col">pnl</th>
+        <th scope="col">trade</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for i in output %}
+      <tr>
+          <th scope="row">{{i.0|date:'Y-m-d H:i'}}</th>
+          <td>{{i.1}}</td>
+          <td>{{i.2}}</td>
+          <td>{{i.3}}</td>
+          <td>{{i.4}}</td>
+          <td>{{i.5}}</td>
+          <td>{{i.6|date:'Y-m-d'}}</td>
+          <td>{{i.7}}</td>
+          <td>{{i.8}}</td>
+          <td>{{i.9}}</td>
+          <td>{{i.10}}</td>
+          <td>{{i.11}}</td>
+      </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% endif %}
+
+{% endlocaltime %}
+{% endblock %}

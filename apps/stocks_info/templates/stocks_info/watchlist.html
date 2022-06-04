@@ -1,0 +1,41 @@
+{% extends "stocks_info/home.html" %}
+{% block title %}Watchlist{% endblock %}
+{% block pagetitle %}<h2 class="text-center">Watchlist</h2>{% endblock %}
+{% block page %}
+<form method="POST">
+    {% csrf_token %}
+    <div class="input-group mb-3">
+        {{ form.ticker }}
+        {{ form.pnl }}
+        {{ form.winrate }}
+        {{ form.timeframe }}
+        {{ form.winloss }}
+        <button type="submit" class="btn btn-primary">Get info!</button>
+    </div>
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Ticker</th>
+            <th scope="col">PnL</th>
+            <th scope="col">Winrate</th>
+            <th scope="col">Time Frame</th>
+            <th scope="col">Winn : Loss</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for i in objects %}
+        <tr>
+            <th scope="row">{{i.ticker}}</th>
+            <td>{{i.pnl}}</td>
+            <td>{{i.winrate}} %</td>
+            <td>{{i.timeframe}}</td>
+            <td>{{i.winloss}}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "stocks_info/home.html" %}
+
+{% block page %}
+    <form method="post" class="col-centered form-inline text-center">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+        {{ form.get_mailbox_aliases }}
+        <button class="btn btn-primary" type="submit">Get Alias!</button>
+        </div>
+    </form>
+{{method}}
+{% if response %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col" class="col-md-3">Title</th>
+      <th scope="col" class="col-md-9">Result</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">JSON response</th>
+      <td>{{ response }}</td>
+    </tr>
+    {% if response.result %}
+    <tr>
+            <th scope="row">Alias:</th>
+            <td>{{response.result.0.Alias}}</td>
+    </tr>
+    <tr>
+            <th scope="row">Active:</th>
+            <td>{{response.result.0.Active}}</td>
+    </tr>
+    {% elif response.error %}
+        <tr>
+            <th scope="row">Error Code:</th>
+            <td>{{response.error.code}}</td>
+        </tr>
+        <tr>
+            <th scope="row">Error Message:</th>
+            <td>{{response.error.message}}</td>
+        </tr>
+        <tr>
+            <th scope="row">Error Data Type:</th>
+            <td>{{response.error.data.type}}</td>
+        </tr>
+        <tr>
+            <th scope="row">Error Data args:</th>
+            <td>{{response.error.data.args}}</td>
+        </tr>
+        <tr>
+            <th scope="row">Error Data Message:</th>
+            <td>{{response.error.data.message}}</td>
+        </tr>
+    {% else %}
+    <p class="text-center text-danger"><strong>{{response}}</strong></p>
+    {% endif %}
+  </tbody>
+</table>
+
+
+
+{% endif %}
+{% endblock %}

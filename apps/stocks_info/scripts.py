@@ -57,10 +57,11 @@ def finviz_parse_news():
 
             parsed_data.append([ticker, date, time, title, href])
 
-    df = pd.DataFrame(parsed_data, columns=['ticker', 'date', 'time', 'title', 'href'])
+    df = pd.DataFrame(parsed_data, columns=[
+                      'ticker', 'date', 'time', 'title', 'href'])
 
     vader = SentimentIntensityAnalyzer()
-    f = lambda title: vader.polarity_scores(title)['compound']
+    def f(title): return vader.polarity_scores(title)['compound']
     df['compound'] = df['title'].apply(f)
     df['date'] = pd.to_datetime(df.date).dt.date
     # mean_df = df.groupby(['ticker', 'date']).mean()
@@ -95,10 +96,11 @@ def finviz_parse_news_form(ticker):
 
             parsed_data.append([ticker, date, time, title, href])
 
-    df = pd.DataFrame(parsed_data, columns=['ticker', 'date', 'time', 'title', 'href'])
+    df = pd.DataFrame(parsed_data, columns=[
+                      'ticker', 'date', 'time', 'title', 'href'])
 
     vader = SentimentIntensityAnalyzer()
-    f = lambda title: vader.polarity_scores(title)['compound']
+    def f(title): return vader.polarity_scores(title)['compound']
     df['compound'] = df['title'].apply(f)
     df['date'] = pd.to_datetime(df.date).dt.date
 
@@ -136,3 +138,182 @@ def get_stock_fundamental_info(ticker):
             parsed_data['Short Float'] = short_float
 
     return parsed_data
+
+
+def gaps(ticker, gap):
+    std = pd.DataFrame(yf.Ticker(ticker).history(
+        start='2010-01-02', actions=False)).reset_index()
+    all_days = std['Date'].count().tolist()
+
+    # get ticker info from yfinance
+    shares_float = round(yf.Ticker(ticker).info['floatShares']/1000000, 2)
+    market_cap = round(yf.Ticker(ticker).info['marketCap']/1000000000, 2)
+
+    for x in std.index:
+        if x >= 1:
+            std.loc[x, ['Gap', 'Change']] = [(std.loc[x, 'Open'] - std.loc[x - 1, 'Close']) / std.loc[x - 1, 'Close'],
+                                             (std.loc[x, 'Close'] - std.loc[x, 'Open']) / std.loc[x, 'Open']]
+
+    if gap > 0:
+        gap_up_f = (std['Gap'] > gap)
+    elif gap < 0:
+        gap_up_f = (std['Gap'] < gap)
+    std = std.loc[gap_up_f]
+    std = std.round(2)
+    std['Date'] = std['Date'].dt.strftime('%Y-%m-%d')
+    std['Gap'] = (std['Gap']*100).astype(int)
+    std['Change'] = (std['Change'] * 100).astype(int)
+
+    df_gaps = std.values.tolist()
+    count_gaps = std['Gap'].count().tolist()
+    green_change = std.loc[std['Change'] > 0]['Change'].count().tolist()
+    red_change = std.loc[std['Change'] < 0]['Change'].count().tolist()
+
+    green_percent = int(std.loc[std['Change'] > 0]
+                        ['Change'].count()/std['Gap'].count()*100)
+    red_percent = int(std.loc[std['Change'] < 0]
+                      ['Change'].count()/std['Gap'].count() * 100)
+    return df_gaps, count_gaps, green_change, red_change, all_days, shares_float, market_cap, green_percent, red_percent
+
+
+def premarket_analize(ticker='aapl'):
+    ticker = yf.Ticker(ticker)
+    hist = ticker.history(prepost=True)
+    return hist
+
+
+def spy_back_test():
+    # daily data
+    stock_data_d = yf.Ticker('spy')
+    stock_data_daily = pd.DataFrame(
+        stock_data_d.history(period='60d', actions=False))
+    stock_data_daily = stock_data_daily.reset_index()
+
+    # intraday data
+    stock_data_i = yf.Ticker('spy')
+    stock_data_intraday = pd.DataFrame(stock_data_i.history(
+        period='60d', interval='5m', actions=False))
+    stock_data_intraday = stock_data_intraday.reset_index()
+
+    # add prev day low to intraday dataframe
+    for y in stock_data_intraday.index:
+        for i in stock_data_daily.index:
+            if i > 0:
+                if stock_data_intraday.loc[y, 'Datetime'].date() == stock_data_daily.loc[i, 'Date'].date():
+                    stock_data_intraday.loc[y,
+                                            'Prev Day Low'] = stock_data_daily.loc[i-1, 'Low']
+
+    sig = 0
+    # take_profit = 0.0
+    # stop_loss = 0.0
+    # stock_data_intraday.loc['take'] = 0.0
+    # stock_data_intraday.loc['stop'] = 0.0
+    # stock_data_intraday['pnl'] = 0.0
+    for y in stock_data_intraday.index:
+        stock_data_intraday.loc[y, 'Signal'] = False
+        if y == 0:
+            stock_data_intraday.loc[y, 'Signal'] = False
+        if y > 0 and stock_data_intraday.loc[y, 'Datetime'].date() == stock_data_intraday.loc[y-1, 'Datetime'].date():
+            # if take_profit != 0.0 and take_profit <= stock_data_intraday.loc[y, 'High']:
+            #     stock_data_intraday.loc[y, 'pnl'] = 1.0
+            # elif take_profit != 0.0 and stop_loss >= stock_data_intraday.loc[y, 'Low']:
+            #     stock_data_intraday.loc[y, 'pnl'] = -1.0
+            if sig == 0 and stock_data_intraday.loc[y, 'Low'] <= stock_data_intraday.loc[y, 'Prev Day Low'] and stock_data_intraday.loc[y-1, 'Low'] > stock_data_intraday.loc[y, 'Prev Day Low'] and stock_data_intraday.loc[y, 'Signal'] == False:
+                stock_data_intraday.loc[y, 'Signal'] = True
+                sig = 1
+                # take_profit = stock_data_intraday.loc[y, 'Prev Day Low'] + 1.0
+                # stop_loss = stock_data_intraday.loc[y, 'Prev Day Low'] - 1.0
+                # stock_data_intraday.loc[y, 'take'] = take_profit
+                # stock_data_intraday.loc[y, 'stop'] = stop_loss
+    else:
+        sig = 0
+        # stop_loss = 0.0
+        # take_profit = 0.0
+    return stock_data_intraday.head()
+
+
+class GetPandasDF:
+
+    def __init__(self, ticker, stop, take):
+        self.ticker = ticker
+        self.stop = stop
+        self.take = take
+
+    # intraday data
+    def get_intraday_data(self):
+
+        stock_data_i = yf.Ticker(self.ticker)
+        stock_daily = pd.DataFrame(stock_data_i.history(period='60d', interval='1d', actions=False)).reset_index()
+        stock_data_intraday = pd.DataFrame(stock_data_i.history(period='60d', interval='5m', actions=False))
+        stock_data_intraday = stock_data_intraday.reset_index()
+
+        # get ATR
+        tr = 0
+        for i in stock_daily.index:
+            tr += stock_daily.loc[i, 'High'] - stock_daily.loc[i, 'Low']
+        ATR = tr/len(stock_daily.index)
+
+        # add prev day low to intraday dataframe
+        for i in stock_data_intraday.index:
+            stock_data_intraday.loc[i, 'Date'] = stock_data_intraday.loc[i, 'Datetime'].date()
+
+        for y in stock_data_intraday.index:
+            filt = stock_data_intraday['Date'] == stock_data_intraday.loc[y, 'Date']
+            day_low = stock_data_intraday.loc[filt, 'Low'].min()
+            stock_data_intraday.loc[y, 'Day Low'] = day_low
+
+        for v in stock_data_intraday.index:
+            if v == 0:
+                stock_data_intraday.loc[v, 'Prev Day Low'] = 0
+            else:
+                if stock_data_intraday.loc[v-1, 'Date'] < stock_data_intraday.loc[v, 'Date']:
+                    stock_data_intraday.loc[v, 'Prev Day Low'] = stock_data_intraday.loc[v-1, 'Day Low']
+                else:
+                    stock_data_intraday.loc[v, 'Prev Day Low'] = stock_data_intraday.loc[v-1, 'Prev Day Low']
+
+        one_day = 0
+        sig = 0
+        long_price = 0
+        stop = self.stop
+        take = self.take
+        for i in stock_data_intraday.index:
+            if i == 0:
+                stock_data_intraday.loc[i, 'one day'] = 0
+                stock_data_intraday.loc[i, 'pnl'] = 0
+            elif i <= len(stock_data_intraday.index):
+                if stock_data_intraday.loc[i-1, 'Date'] == stock_data_intraday.loc[i, 'Date']:
+                    stock_data_intraday.loc[i, 'one day'] = one_day
+                    stock_data_intraday.loc[i, 'pnl'] = 0
+                    if sig == 0 and stock_data_intraday.loc[i, 'Low'] <= stock_data_intraday.loc[i, 'Prev Day Low'] and stock_data_intraday.loc[i - 1, 'Low'] > stock_data_intraday.loc[i, 'Prev Day Low']:
+                        stock_data_intraday.loc[i, 'trade'] = 1
+                        stock_data_intraday.loc[i, 'pnl'] = 0
+                        sig = 1
+                        long_price = stock_data_intraday.loc[i, 'Prev Day Low']
+                        stop_price = long_price - stop
+                        profit_price = long_price + take
+                    if sig == 1 and long_price != 0:
+                        if stop_price >= stock_data_intraday.loc[i, 'Low']:
+                            stock_data_intraday.loc[i, 'pnl'] = -stop
+                            long_price = 0
+                        if profit_price <= stock_data_intraday.loc[i, 'High'] and stock_data_intraday.loc[i, 'trade'] != 1:
+                            stock_data_intraday.loc[i, 'pnl'] = take
+                            long_price = 0
+
+                elif stock_data_intraday.loc[i - 1, 'Date'] < stock_data_intraday.loc[i, 'Date']:
+                    if one_day == 0:
+                        one_day = 1
+                    else:
+                        one_day = 0
+
+                    if long_price != 0:
+                        stock_data_intraday.loc[i, 'pnl'] = stock_data_intraday.loc[i-1, 'Close'] - long_price
+                        long_price = 0
+                    stock_data_intraday.loc[i, 'one day'] = one_day
+                    stock_data_intraday.loc[i, 'pnl'] = 0
+                    sig = 0
+        pnl = stock_data_intraday['pnl'].sum()
+        all_trades = stock_data_intraday.loc[stock_data_intraday['pnl'] != 0, 'pnl'].count()
+        profit_trades = stock_data_intraday.loc[stock_data_intraday['pnl'] > 0, 'pnl'].count()
+        loss_trades = stock_data_intraday.loc[stock_data_intraday['pnl'] < 0, 'pnl'].count()
+        return stock_data_intraday.loc[stock_data_intraday['pnl'] != 0], pnl, ATR, all_trades, profit_trades, loss_trades
+

@@ -1,0 +1,13 @@
+{% extends "stocks_info/home.html" %}
+
+{% block page %}
+
+<div class="text-center col-md-8 align-middle">
+    <ul class="list-inline">
+        <li class="list-inline-item"><a href="{% url 'domain_service' %}">Domain Service</a></li>
+        <li class="list-inline-item"><a href="{% url 'mailbox_service' %}">Mailbox Service</a></li>
+        <li class="list-inline-item"><a href="{% url 'aliases_service' %}">Alias Srvice</a></li>
+    </ul>
+</div>
+
+{% endblock %}

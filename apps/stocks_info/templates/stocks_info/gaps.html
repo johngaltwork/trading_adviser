@@ -1,0 +1,76 @@
+{% extends "stocks_info/home.html" %}
+{% block title %}
+
+
+<h2 class="text-center">Check stock gaps on history</h2>
+{% endblock %}
+{% block page %}
+<form method="POST">
+    {% csrf_token %}
+    <div class="input-group mb-3">
+        {{ form.ticker }}
+        {{ form.gap }}
+        <button type="submit" class="btn btn-primary">Get info!</button>
+    </div>
+</form>
+
+
+
+{% if gaps %}
+<table class="table table-borderless">
+    <tr>
+      <th scope="row" class="text-center"><p><small><strong>All days:</strong></small></p></th>
+      <td class="text-start"><p><small>{{all_days}}</small></p></td>
+      <th scope="row" class="text-center text-primary"><p><small><strong>All gaps:</strong></small></p></th>
+      <td class="text-start"><p><small>{{all_gaps}}</small></p></td>
+      <th scope="row" class="text-center text-success"><p><small><strong>Green days:</strong></small></p></th>
+      <td class="text-start"><p><small>{{green}}</small></p></td>
+      <th scope="row" class="text-center text-danger"><p><small><strong>Red days:</strong></small></p></th>
+      <td class="text-start"><p><small>{{red}}</small></p></td>
+    </tr>
+    <tr>
+      <th scope="row" class="text-center"><p><small><strong>Shares Float:</strong></small></p></th>
+      <td class="text-start"><p><small>{{shares_float}} Mln</small></p></td>
+      <th scope="row" class="text-center text-primary"><p><small><strong>Market cap:</strong></small></p></th>
+      <td class="text-start"><p><small>{{market_cap}} B</small></p></td>
+      <th scope="row" class="text-center text-success"><p><small><strong>Green days %:</strong></small></p></th>
+      <td class="text-start"><p><small>{{green_percent}} %</small></p></td>
+      <th scope="row" class="text-center text-danger"><p><small><strong>Red days %:</strong></small></p></th>
+      <td class="text-start"><p><small>{{red_percent}} %</small></p></td>
+    </tr>
+</table>
+
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Date</th>
+      <th scope="col">Open</th>
+      <th scope="col">High</th>
+      <th scope="col">Low</th>
+      <th scope="col">Close</th>
+      <th scope="col">Volume</th>
+      <th scope="col">Gap</th>
+      <th scope="col">Change</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for i in gaps %}
+    <tr>
+      <th scope="row">{{i.0}}</th>
+      <td>{{i.1}}</td>
+      <td>{{i.2}}</td>
+      <td>{{i.3}}</td>
+      <td>{{i.4}}</td>
+      <td>{{i.5}}</td>
+      <td>{{i.6}} %</td>
+      <td>{{i.7}} %</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+
+{% endif %}
+
+{% endblock %}

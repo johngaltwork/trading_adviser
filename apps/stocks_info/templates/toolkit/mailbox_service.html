@@ -1,0 +1,32 @@
+{% extends "stocks_info/home.html" %}
+
+{% block page %}
+{{cleaned_data}}
+{{test_response}}
+
+    <form method="post" class="form-inline .was-validated">
+    {% csrf_token %}
+        <div class="form-group pull-left get-aliases-form">
+          {{ form.create_mailbox }}
+          <button class="btn btn-primary get-aliases" type="submit">Create Mailbox!</button>
+        </div>
+    </form>
+
+    <form method="post" class="form-inline .was-validated">
+    {% csrf_token %}
+        <div class="form-group pull-left get-aliases-form">
+          {{ form.get_mailbox_info }}
+          <button class="btn btn-primary get-aliases" type="submit">Get Mailbox Info!</button>
+        </div>
+    </form>
+
+    <form method="post" class="form-inline .was-validated">
+    {% csrf_token %}
+        <div class="form-group pull-left get-aliases-form">
+          {{ form.delete_mailbox }}
+          <button class="btn btn-primary get-aliases" type="submit">Delete Mailbox!</button>
+        </div>
+    </form>
+
+
+{% endblock %}

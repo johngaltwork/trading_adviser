@@ -1,16 +1,69 @@
 {% extends "base.html" %}
 {% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 <div class="row">
 <div class="col-md-2">
-    <p class="text-primary">this is left side text</p>
+
+    <p class="text-success ms-3"><b>Watch List</b></p>
+    <!--<form method="POST">
+    {% csrf_token %}
+        <div class="input-group-sm ms-3">
+            {{ watch_list_form }}
+            <button type="submit" class="btn btn-primary mt-2">Add ticker!</button>
+        </div>
+    </form>-->
+
+    {% for i in context %}
+    <p class="ms-3">{{i.ticker}} - {{i.timeframe}}m - {{i.winloss}}</p>
+    {% endfor %}
+
 </div>
 <div class="col-md-8">
-    <h2 class="text-center">Trading Advisor App</h2>
+
     {% block page %}
     {% endblock %}
 </div>
 <div class="col-md-2">
-    <p class="text-success">this is right side text</p>
+    <p class="text-success"><b>Risk calculator</b></p>
+    <form>
+    {% csrf_token %}
+        <div class="input-group-sm me-3">
+            <label for="risk" class="form-label">Risk in $</label>
+            <input id="risk" class="form-control form-control-sm" type="text" placeholder="enter risk in $">
+            <label for="trigger" class="form-label">Trigger Price</label>
+            <input id="trigger" class="form-control form-control-sm" type="text" placeholder="enter trigger">
+            <label for="stop" class="form-label">Stop Price</label>
+            <input id="stop" class="form-control form-control-sm" type="text" placeholder="enter stop">
+
+            <button id="calc_size" type="button" class="btn btn-primary mt-2">Calculate!</button>
+        </div>
+    </form>
+
+        <div id="size" class="mt-2"><h3></h3></div>
+        <div id="target1"><p></p></div>
+        <div id="target1_5"><p></p></div>
+        <div id="target2"><p></p></div>
+        <div id="target2_5"><p></p></div>
+
 </div>
 </div>
+<script>
+    $('#calc_size').click(function(){
+        $('#size h3').html('')
+        risk = $('#risk').val()
+        trigger = $('#trigger').val()
+        stop = $('#stop').val()
+        target1 = trigger - stop + parseFloat(trigger)
+        target1_5 = 1.5*(trigger - stop) + parseFloat(trigger)
+        target2 = 2*(trigger - stop) + parseFloat(trigger)
+        target2_5 = 2.5*(trigger - stop) + parseFloat(trigger)
+
+        size = risk/(trigger - stop)
+        $('#size h3').html('size: ' + size.toFixed(0))
+        $('#target1 p').html('target 1: ' + target1)
+        $('#target1_5 p').html('target 1.5: ' + target1_5)
+        $('#target2 p').html('target 2: ' + target2)
+        $('#target2_5 p').html('target 2.5: ' + target2_5)
+    })
+</script>
 {% endblock %}

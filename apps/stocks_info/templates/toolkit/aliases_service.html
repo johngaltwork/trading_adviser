@@ -1,0 +1,39 @@
+{% extends "stocks_info/home.html" %}
+
+{% block page %}
+{{cleaned_data}}
+{{response}}
+
+    <form method="post" class="form-inline .was-validated">
+    {% csrf_token %}
+        <div class="form-group pull-left get-aliases-form">
+          {{ form.get_mailbox_aliases }}
+          <button class="btn btn-primary get-aliases" type="submit">Get Aliases!</button>
+        </div>
+    </form>
+
+    <form method="post" class="form-inline .was-validated">
+    {% csrf_token %}
+        <div class="form-group pull-left get-aliases-form">
+          {{ form.create_mailbox_alias }}
+          <button class="btn btn-primary get-aliases" type="submit">Create Aliases!</button>
+        </div>
+    </form>
+
+    <form method="post" class="form-inline .was-validated">
+    {% csrf_token %}
+        <div class="form-group pull-left get-aliases-form">
+          {{ form.update_mailbox_alias }}
+          <button class="btn btn-primary get-aliases" type="submit">Update Aliases!</button>
+        </div>
+    </form>
+
+    <form method="post" class="form-inline .was-validated">
+    {% csrf_token %}
+        <div class="form-group pull-left get-aliases-form">
+          {{ form.delete_mailbox_alias }}
+          <button class="btn btn-primary get-aliases" type="submit">Delete Aliases!</button>
+        </div>
+    </form>
+
+{% endblock %}
